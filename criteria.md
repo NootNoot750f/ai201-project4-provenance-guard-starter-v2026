@@ -135,7 +135,7 @@ I chose this target because users may accidentally submit incomplete or excessiv
 
 ## Capstone criteria
 
-Written before any capstone results existed. Committed in: 
+Written before any capstone results existed. Committed in: capstone criteria
 
 ## 1. Retrieve existing content
 
