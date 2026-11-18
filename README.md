@@ -471,9 +471,9 @@ I chose the 0.3/0.7 weights after seeing the before results on the same samples,
 
 **What This Extends.** Provenance Guard (Units 7–8). The extension adds one capability: `GET /content/<id>`, which returns the current status of one submitted item, read from the audit log. Everything else in the service is unchanged.
 
-**The Shape.** DRAFT — rewrite in your own words. Shape C: one capability added to a system that already works. The new capability is `GET /content/<id>`, plus the instrumentation that records each submission's duration, and the local run path and record.
+**The Shape.** I chose Shape C because I wanted to add a new capability to an existing system without rebuilding or changing how the detector works. The main addition is `GET /content/<id>`, which allows users to retrieve the stored results of a previous submission. I also added instrumentation to record how long submissions take to process, along with a local run process and a record of the results.
 
-**Out of scope.** DRAFT — my choice, edit as you see fit. I'm not changing the detector (`detector.py`), the signals or weights in `stylometry.py` and `config.py`, the thresholds or label wording, the appeal path, the rate limits, or hosting. I'm not adding a database: status comes from the existing audit log.
+**Out of scope.** I decided to keep the existing detection system unchanged. I am not modifying `detector.py`, the detection signals or their weights in `stylometry.py` and `config.py`, the classification thresholds, or the label wording. I am also leaving the appeal process, rate limits, and hosting as they are. I chose not to add a database because the existing audit log already provides the information needed to retrieve submission status.
 
 **Running It.** Path B, local with logs. See [RUNNING.md](RUNNING.md).
 
@@ -538,31 +538,42 @@ Excerpt from trial 1 (criterion 4 for the first two submissions, and criterion 5
 ```
 
 
-**The Improvement.** DRAFT — rewrite in your own words.
+**The Improvement.**
 
-**What I changed:** no code changed. I tightened criterion 4 by adding a whitespace-only submission (`capstone-whitespace-01`) that must be rejected with HTTP 400 and logged with `text_length` 0. The original criterion 4 line is still in `criteria.md`, with the revision underneath it and the reason.
+**What I changed:** No application code was changed. I updated `criteria.md` to expand Criterion 4 with an additional whitespace-only submission. The new check requires the service to reject whitespace-only text with HTTP 400 and record a `text_length` of 0 after whitespace is stripped.
 
-**Which diagnosis pointed at it:** none. Every criterion passed in the first run, so there was no miss to diagnose. The tightening was for criterion 4 because its original test could only check the stripping on the ten submissions, and every one of them passed. That's a weak check, not a failure.
+**Which diagnosis pointed at it:** All five original criteria passed in all three trials, so there was no failed criterion requiring a code fix. I tightened Criterion 4 because the original tests did not specifically check what happened when a submission contained only whitespace. This added an edge case to verify that the service measures text length consistently after stripping whitespace.
 
 **Run Log, tightened criterion 4 (`python run_capstone.py --label tightened`):**
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 4. Text length after stripping (original) | 10/10 | 10/10 | 10/10 | 10/10 | MET |
-| 4. Whitespace-only submission (added) | 1/1 | 1/1 | 1/1 | 1/1 | *(your verdict)* |
+| 1. Retrieve existing content | 5/5 | 5/5 | 5/5 | 5/5 | MET |
+| 2. Unknown IDs return 404 | 5/5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Duration recorded | 10/10 | 10/10 | 10/10 | 10/10 | MET |
+| 4. Text length after stripping | 10/10 | 10/10 | 10/10 | 10/10 | MET |
+| 5. Bad input rejected and logged | 3/3 | 3/3 | 3/3 | 3/3 | MET |
+| Added whitespace-only check | 1/1 | 1/1 | 1/1 | 1/1 | MET |
 
-Full output: `results/capstone_run_2026-11-17_2138_tightened.md`.
+**Did it help:** The additional check passed in all three trials. It confirms that whitespace-only submissions are rejected and recorded with a text length of zero. This gives the evaluation better coverage of edge cases, although it does not prove that every possible malformed input is handled correctly.
 
-**Did it help:** the tightened check passed in every trial. It didn't reveal a problem, which is the honest result of a check that the service already handled correctly.
+**What's Still Broken.**
 
+**Still missed:** None. All five original criteria and the additional whitespace-only check passed in all three trials.
 
-**What's Still Broken.** DRAFT — rewrite in your own words.
+**What I'd do next, and why I stopped:** I would investigate the unusually high `duration_ms` value for `capstone-sub-01` in Trial 1. It was 17,229.5 ms, compared with approximately 100–190 ms for the other submissions. This was the first submission after restarting the service and included model loading, so it appears to be a startup delay rather than normal request-processing time. I would separate model initialization time from request-processing time in a future improvement. I stopped here because the value was valid under the existing criterion, and changing the timing implementation was outside the scope of this improvement.
 
-**Still missed:** nothing in the five capstone criteria. All five passed in all three trials.
+**The one thing I'd do first:** separate startup time from request duration, so the audit log gives a more representative picture of normal request performance.
 
-**What I'd do next, and why I stopped:** the checks I wrote mostly confirm what the code always writes. Criteria 3 and 4 can't fail unless the logging breaks, and criterion 1 compares the endpoint to the same log it reads from. I stopped at the tightened criterion 4 because the brief asked for one change, and I didn't find a real miss to fix. The next step I'd take is a criterion that tests something the service could get wrong, such as a `GET /content/<id>` for an item whose appeal was logged after its decision, checked against the status the log shows.
+**How I Used AI.**
 
-**The one thing I'd do first:** write a criterion that tests the endpoint against a fresh submission made while the service is under the rate limit, so it checks more than the log's own consistency.
+**Moment 1: Capstone criteria development**
+- *What I asked for:* I asked AI to help develop five measurable criteria for the new capstone extension, covering content retrieval, unknown IDs, request duration, text length, and rejected submissions.
+- *What came back:* AI suggested initial criteria with measurable targets and explanations for why each behavior mattered.
+- *What I changed:* I corrected the suggestions to match the actual implementation. I clarified which fields the endpoint returns, how server-generated `content_id` values are identified, which rejection reasons come from `app.py`, and how whitespace is counted.
 
+**Moment 2: Trial results and improvement**
+- *What I asked for:* I asked AI to help interpret the three capstone trials, write the verdicts, and identify an additional test that could make the evaluation stronger.
+- *What came back:* AI organized the results into MET verdicts and suggested expanding Criterion 4 to cover whitespace-only submissions.
+- *What I changed:* I kept the verdicts consistent with the actual trial counts and added the whitespace-only case to Criterion 4. I did not change the application code, because the original criteria passed and the improvement was an additional test rather than a code fix.
 
-**How I Used AI.** *(filled in during Milestone 7)*
