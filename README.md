@@ -233,7 +233,7 @@ I revised my criteria based on the feedback. I changed the false-positive thresh
 
 ## Rate Limiting
 
-**My limits:** ___ per minute, ___ per day
+**My limits:** 5 per minute, 50 per day
 
 **Why those numbers and not others:**
 <!-- Think about two people: a real writer submitting their own work a few
@@ -241,17 +241,21 @@ I revised my criteria based on the feedback. I changed the false-positive thresh
      thresholds. Your numbers have to be liveable for the first and hostile to
      the second. -->
 
-**What a caller counts as:** <!-- per address, or per creator_id? They fail
-differently — one script can look like a thousand callers, and one household
-can look like one. -->
+I chose these limits to balance normal usage with protection against abuse. Someone submitting their own writing might submit several pieces throughout the day, so these limits should not interfere with normal use. However, someone using an automated script to repeatedly test different text variations could quickly reach the limits. The per-minute limit helps prevent someone from sending too many requests in a short period, while the daily limit makes it harder to repeatedly test the detector's boundaries over time.
+
+     
+
+**What a caller counts as:** The service identifies callers using the creator_id provided in the request body. Requests with the same creator_id share the same rate limit. If a request does not contain a usable creator_id, the service uses the caller's IP address instead.
+
+There are some trade-offs with this approach. Someone could potentially bypass the limits by generating a new creator_id for every request. On the other hand, using IP addresses as the primary identifier could cause multiple people sharing the same internet connection to affect each other's limits. I chose creator_id because I wanted the limits to apply to individual identities rather than entire networks.
 
 **The run of status codes when I pushed past it:**
 
-<!-- python run_attacks.py --flood 15 -->
+I tested the rate limiter by sending eight POST /submit requests using the same creator_id, rl-demo.
+200 200 200 200 200 429 429 429
 
-```
 
-```
+The first five requests were accepted, while the remaining three received HTTP 429 (Too Many Requests). These rejected requests were also recorded in the audit log with event: rejected, reason: rate_limited, and limit: 5 per 1 minute.
 
 ---
 
