@@ -39,6 +39,16 @@
 <!-- The path a submission takes, from arriving to the label a reader sees.
      Six or seven steps — this is the trace you wrote in Milestone 1. -->
 
+1. **Arrives.** `POST /submit` receives JSON with `text` and `creator_id`. A body that isn't an object, a missing or blank `creator_id`, text under 20 characters or over 10,000, or text the model can't score is refused with a 400 and logged as a rejection.
+2. **Signal one.** `detector.model_signal` runs the text through gpt2 on the local machine and measures perplexity (how predictable the text is). That is squashed to a 0–1 `model_score`, where higher means more AI-like.
+3. **Signal two.** `stylometry.style_signal` measures sentence-length spread, type-token ratio, and punctuation density, and averages them into a 0–1 `style_score`, where higher means more AI-like.
+4. **Combined.** `scoring.combine_signals` takes a 50/50 weighted average. If the two signals are 0.4 or more apart, the result is pulled halfway back toward 0.5.
+5. **Labeled.** `scoring.score_to_label` maps the combined score to `ai` (0.65 or more), `human` (0.35 or less), or `unsure` (in between), and returns the sentence a reader sees.
+6. **Logged.** `audit.log_decision` appends one line to `logs/audit.jsonl` with the content ID, creator ID, guess, all three scores, label, and status `decided`.
+7. **Answered.** The response carries `content_id`, `guess`, `confidence` (the combined score), `label`, `model_score`, and `style_score`.
+
+**Appeal path.** `POST /appeal` takes a `content_id` and `reasoning`. It returns 404 if no decision exists for that ID. Otherwise it appends an `event: appeal` entry with status `under_review` beside the original decision, and confirms. The original entry is never overwritten.
+
 
 
 ---
@@ -53,35 +63,35 @@
 
 ### Signal one — the model signal
 
-**What it measures:**
+**What it measures:** how predictable the text is to gpt2 (perplexity). Low perplexity means the model could have guessed the next words, which reads as AI-like. Perplexity is turned into a 0–1 score with a logistic curve centred at perplexity 45.
 
-**Why that might differ between human and AI writing:**
+**Why that might differ between human and AI writing:** language models write by choosing likely next words, so their output tends to be predictable to another model. Human writing is more idiosyncratic.
 
-**What it can't see:**
+**What it can't see:** predictability isn't authorship. It rewards common words in short, plain sentences, so ordinary human writing scores as machine-like. In my calibration run, a plain paragraph drafted for testing scored 0.84 on this signal, which is in the AI range, while a casual paragraph scored 0.26. Dense, rare-word prose can score as human regardless of who wrote it.
 
 ### Signal two — the style signal
 
-**What it measures:**
+**What it measures:** three properties of the text's shape, each turned into an AI-leaning 0–1 score and averaged equally:
+- *Sentence-length spread:* coefficient of variation of words per sentence. Low spread (even sentences) reads as AI-like. Fewer than two sentences is scored neutral at 0.5.
+- *Type-token ratio:* unique words over total words. A narrow vocabulary reads as AI-like. 0.3 or lower is fully AI-like, 0.8 or higher is fully human-like.
+- *Punctuation density:* commas, semicolons, colons, and dashes per word. Little of it reads as AI-like. 0 is fully AI-like, 0.15 or more is fully human-like.
 
-**Why that might differ between human and AI writing:**
+**Why that might differ between human and AI writing:** generated prose tends toward even sentence lengths and a narrower vocabulary. Human writers vary their rhythm and use more interruptions.
 
-**What it can't see:**
+**What it can't see:** the meaning of the text, and anything that changes its shape without changing its content. Adding typos, splitting sentences, or padding with quotations moves this signal. Type-token ratio also falls as text gets longer, so long texts look more AI-like for that reason alone. Plain, even human writing is scored as AI-like.
 
 ### The combining rule
 
 <!-- Write the rule in words, then give the numbers. What happens when the two
      signals disagree? -->
 
-**The rule:**
+**The rule:** a weighted average of the two signals. If they disagree strongly (at least 0.4 apart), the combined score is pulled halfway back toward 0.5, so a split verdict becomes "unsure" instead of a confident call. This is deliberate: a false accusation costs a writer more than a missed AI post.
 
-**The numbers:**
+**The numbers:** weights 0.5 model and 0.5 style. Disagreement gap 0.4. Damping factor 0.5. All in `config.py`.
 
 **Where it lives:** `scoring.py::combine_signals`
 
-<!-- ⚠️ The grader checks your code against that line. If your rule lives
-     somewhere else, say where. -->
-
-**A case where my two signals split, and what my rule does with it:**
+**A case where my two signals split, and what my rule does with it:** a plain paragraph drafted for testing, about buying milk, scored 0.84 on the model signal and 0.41 on the style signal. The gap is 0.42, so the rule applied. The plain average would have been 0.625, which is close to the AI label; after damping it is 0.56, labelled unsure. The rule stopped a plain human paragraph from being labelled AI, but only because the style signal disagreed.
 
 
 
@@ -96,14 +106,11 @@
 
 | Label | Score range | The exact text a reader sees |
 |---|---|---|
-| high-confidence human |  |  |
-| unsure |  |  |
-| high-confidence AI |  |  |
+| high-confidence human | 0.00 – 0.35 | We think this was probably written by a person. |
+| unsure | 0.35 – 0.65 | We couldn't tell with confidence whether this was written by a person or generated by AI. This is not a judgment against you. If you wrote it yourself, you can appeal and a person will look at it. |
+| high-confidence AI | 0.65 – 1.00 | This looks like it was likely generated by an AI tool. If you wrote it yourself, you can appeal this decision. |
 
-**Why I worded the "unsure" one this way:**
-<!-- It's the hardest of the three. It has to admit uncertainty without
-     sounding like an accusation, because the person reading it may well have
-     written every word themselves. -->
+**Why I worded the "unsure" one this way:** it's the label most likely to reach a person who wrote every word, so it says the system doesn't know, tells them it isn't a judgment, and points them to appeal before anything else. The AI label also points to appeal, since it's the one that can cost a writer the most.
 
 
 
@@ -124,11 +131,18 @@
 ```bash
 $ curl -X POST http://127.0.0.1:5000/submit \
   -H "Content-Type: application/json" \
-  -d '{"text": "...", "creator_id": "..."}'
+  -d '{"text": "I went to the store on Tuesday to buy milk. They were out of the brand I like, so I got a different one. It was fine. I will probably buy it again.", "creator_id": "writer-42"}'
 ```
 
 ```json
-
+{
+  "confidence": 0.5625,
+  "content_id": "f0de72f98f9c4084a43bd30497fe73db",
+  "guess": "unsure",
+  "label": "We couldn't tell with confidence whether this was written by a person or generated by AI. This is not a judgment against you. If you wrote it yourself, you can appeal and a person will look at it.",
+  "model_score": 0.8362,
+  "style_score": 0.414
+}
 ```
 
 **An appeal**
@@ -136,21 +150,59 @@ $ curl -X POST http://127.0.0.1:5000/submit \
 ```bash
 $ curl -X POST http://127.0.0.1:5000/appeal \
   -H "Content-Type: application/json" \
-  -d '{"content_id": "...", "reasoning": "..."}'
+  -d '{"content_id": "f0de72f98f9c4084a43bd30497fe73db", "reasoning": "I wrote this myself on Tuesday. It is a plain description of a shopping trip."}'
 ```
 
 ```json
-
+{
+  "content_id": "f0de72f98f9c4084a43bd30497fe73db",
+  "message": "Your appeal has been recorded. The item is now under review.",
+  "status": "under_review"
+}
 ```
 
-**What the log shows afterwards**
+**What the log shows afterwards** (the first entry is an earlier casual-text submission, not the one above; it's kept because the log is append-only)
 
 ```bash
 $ curl "http://127.0.0.1:5000/log?limit=3"
 ```
 
 ```json
-
+{
+  "count": 3,
+  "entries": [
+    {
+      "combined_score": 0.2646,
+      "content_id": "713b8debe89e4b8b9c165fd056f4246a",
+      "creator_id": "writer-42",
+      "guess": "human",
+      "label": "We think this was probably written by a person.",
+      "model_score": 0.2621,
+      "status": "decided",
+      "style_score": 0.267,
+      "timestamp": "2026-11-18T00:58:36+00:00"
+    },
+    {
+      "combined_score": 0.5625,
+      "content_id": "f0de72f98f9c4084a43bd30497fe73db",
+      "creator_id": "writer-42",
+      "guess": "unsure",
+      "label": "We couldn't tell with confidence whether this was written by a person or generated by AI. This is not a judgment against you. If you wrote it yourself, you can appeal and a person will look at it.",
+      "model_score": 0.8362,
+      "status": "decided",
+      "style_score": 0.414,
+      "timestamp": "2026-11-18T00:58:46+00:00"
+    },
+    {
+      "content_id": "f0de72f98f9c4084a43bd30497fe73db",
+      "creator_id": "writer-42",
+      "event": "appeal",
+      "reasoning": "I wrote this myself on Tuesday. It is a plain description of a shopping trip.",
+      "status": "under_review",
+      "timestamp": "2026-11-18T00:58:46+00:00"
+    }
+  ]
+}
 ```
 
 ---
