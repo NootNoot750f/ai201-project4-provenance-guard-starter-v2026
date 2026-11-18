@@ -464,3 +464,27 @@ I chose the 0.3/0.7 weights after seeing the before results on the same samples,
 ---
 
 📖 **How to run this project: [RUNNING.md](RUNNING.md)**
+
+---
+
+## Capstone
+
+**What This Extends.** Provenance Guard (Units 7–8). The extension adds one capability: `GET /content/<id>`, which returns the current status of one submitted item, read from the audit log. Everything else in the service is unchanged.
+
+**The Shape.** DRAFT — rewrite in your own words. Shape C: one capability added to a system that already works. The new capability is `GET /content/<id>`, plus the instrumentation that records each submission's duration, and the local run path and record.
+
+**Out of scope.** DRAFT — my choice, edit as you see fit. I'm not changing the detector (`detector.py`), the signals or weights in `stylometry.py` and `config.py`, the thresholds or label wording, the appeal path, the rate limits, or hosting. I'm not adding a database: status comes from the existing audit log.
+
+**Running It.** Path B, local with logs. See [RUNNING.md](RUNNING.md).
+
+**Instrumentation.** *(filled in during Milestone 3)*
+
+**What It Costs.** *(filled in during Milestone 3)*
+
+**Run Log and Verdicts.** *(filled in during Milestone 5)*
+
+**The Improvement.** *(filled in during Milestone 6)*
+
+**What's Still Broken.** *(filled in during Milestone 7)*
+
+**How I Used AI.** *(filled in during Milestone 7)*
