@@ -1,0 +1,32 @@
+# Human samples — written by me (Nick), 2026
+# Each block is one piece. Don't edit after the first run.
+
+## H01 — Everyday observation
+This morning, I made a cup of coffee, set it on my desk to cool down for just a minute, and immediately got pulled into answering an urgent email. By the time I remembered it was there, it had gone completely lukewarm. It is a tiny inconvenience, yet having to choose between drinking tepid coffee or microwaving it, which somehow ruins the flavor, always starts the day off on a slightly frustrating note.
+
+## H02 — Technology
+My phone recently stopped charging properly whenever I plugged it in, requiring me to hold the cable at a very specific angle just to get a connection. Before buying a new charger or taking the phone in for repair, I turned it off and gently used a wooden toothpick to clean out the charging port. A surprising amount of compacted pocket lint came out, and once it was clear, the cable snapped right in and charged normally again.
+
+## H03 — Opinion
+I generally prefer working alone because it gives me complete control over my pace and environment. When I am tackling a complex task, I do my best thinking in quiet, uninterrupted blocks of time without having to pause to explain my half-formed ideas or compromise on minor details. While brainstorming with a team has its place, solo work allows me to enter a state of deep focus much more easily.
+
+## H04 — Memory
+I still vividly remember my eighth-grade science fair, mostly because my project went wrong right before the judges walked over. I had built a small model bridge out of balsa wood to test weight distribution, and while I was adjusting the display board, my elbow knocked the entire structure onto the floor, snapping a key support beam. I had to spend the next five minutes hastily explaining what the data would have shown while holding the broken pieces together, which taught me a quick lesson in staying calm under pressure.
+
+## H05 — Casual explanation
+You really have to try bouldering. It is basically indoor rock climbing without ropes, and it is way more fun than a regular gym workout. Instead of just mindlessly lifting weights, every climb is like a physical puzzle where you have to figure out how to balance your weight and reach the next hold without falling onto the padded mats below. You get completely absorbed in solving the route, so you end up getting a great full-body workout without even realizing you are exercising.
+
+## H06 — Technical
+When a computer connects to a Wi-Fi network, it begins by scanning radio frequencies for beacon frames broadcast by nearby routers to identify available networks. Once you select a network and enter the password, the computer and router perform a cryptographic handshake, such as WPA3, to verify credentials and establish an encrypted link without sending the password in plain text. Finally, the router assigns the computer a local IP address using DHCP, allowing the device to route traffic to and from the wider internet.
+
+## H07 — Reflection
+I used to think that being productive meant constantly staying busy and filling every open hour of the day with tasks. Over time, I realized that packing my schedule actually led to burnout and lower-quality work because I never gave my brain time to reset. Now, I understand that true productivity is about prioritizing the few things that actually matter and protecting time for rest so I have the energy to execute them well.
+
+## H08 — Practical
+To prepare for a busy week, I start on Sunday afternoon by writing down every deadline, meeting, and errand in one place so nothing catches me off guard. Next, I pick the top two or three priorities for each day and block off specific hours on my calendar to get them done before checking emails or messages. Finally, I handle basic logistics ahead of time, like prepping a few simple meals and laying out what I need for Monday morning, so I am not wasting mental energy on small decisions during the week.
+
+## H09 — Short opinion
+A reliable computer is much more important than a fast one. High processing speeds do not matter if the system crashes unexpectedly, drops connections, or forces you to constantly troubleshoot errors. A slightly slower machine that works consistently every time you open it saves far more time and frustration in the long run.
+
+## H10 — Longer reflection
+Over the past several months, I have been working toward building a consistent writing habit, aiming to put down at least five hundred words every single day. On paper, it sounds like a modest goal that should only take about thirty minutes, yet it has turned out to be much more challenging than I expected. The biggest obstacle has not been a lack of time, but rather perfectionism, constantly editing sentences in my head before I even type them out, which quickly drains my momentum. Learning to separate the drafting phase from the editing phase, and giving myself permission to write badly just to get ideas onto the page, has been a slow adjustment, though it is finally starting to make the daily routine feel sustainable.
