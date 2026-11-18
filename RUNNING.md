@@ -306,3 +306,37 @@ is evidence, and the entries you paste into your README are what unit 8 grades.
 
 **Do not delete and recreate this repository.** You submit the same URL both
 units.
+
+---
+
+## Capstone run path (Path B — local with logs)
+
+Tested from a fresh clone of this repo, on Windows with Python 3.11.3.
+
+**Environment**
+- Python 3.11, 3.12, or 3.13 (not 3.14)
+- Pinned dependencies in `requirements.txt` (Flask, flask-limiter, transformers, torch)
+- The gpt2 model, about 526 MB, downloaded to the Hugging Face cache on first use
+
+**Start it**
+
+```bash
+python -m venv .venv
+.venv\Scripts\Activate.ps1          # macOS/Linux: source .venv/bin/activate
+python -m pip install -r requirements.txt
+python app.py
+```
+
+The service runs on `http://127.0.0.1:5000`. Set `PORT=5001` to run a second copy alongside the first.
+
+**Check it**
+
+```bash
+curl.exe -X POST http://127.0.0.1:5000/ping -H "Content-Type: application/json" -d '{\"message\": \"hello\"}'
+```
+
+**New in the capstone**
+- `GET /content/<content_id>` returns one item's current status, read from `logs/audit.jsonl`.
+- Each decision log entry records `duration_ms` and `text_length`.
+
+**Where the log is:** `logs/audit.jsonl`. Every submission, rejection, and appeal is one line.
