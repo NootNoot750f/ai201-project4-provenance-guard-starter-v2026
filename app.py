@@ -199,9 +199,13 @@ def submit():
     what should this do when `text` is missing, empty, or enormous? A crash on
     a malformed input is one of the most common real failures there is.
     """
+    import time
+
     import detector
     import scoring
     import stylometry
+
+    started = time.perf_counter()
 
     payload = request.get_json(silent=True)
     if not isinstance(payload, dict):
@@ -257,6 +261,8 @@ def submit():
         combined_score=combined,
         label=label,
         status="decided",
+        duration_ms=round((time.perf_counter() - started) * 1000, 1),
+        text_length=len(text),
     )
 
     return jsonify({
@@ -340,6 +346,37 @@ def get_log():
     limit = request.args.get("limit", type=int)
     entries = audit.read_entries(limit=limit)
     return jsonify({"count": len(entries), "entries": entries})
+
+
+@app.get("/content/<content_id>")
+def get_content(content_id):
+    """
+    One item's current status, read from the audit log.
+
+        curl "http://127.0.0.1:5000/content/<content_id>"
+
+    `status` is the status on the latest entry for this id: `decided` after
+    the first judgment, `under_review` once an appeal is recorded. 404 if the
+    id has no decision in the log.
+    """
+    entries = audit.entries_for(content_id)
+    decisions = [e for e in entries if e.get("guess")]
+    if not decisions:
+        return jsonify({"error": "not_found",
+                        "message": f"No decision found for content_id {content_id!r}."}), 404
+    first = decisions[0]
+    latest = entries[-1]
+    return jsonify({
+        "content_id": content_id,
+        "creator_id": first.get("creator_id"),
+        "guess": first.get("guess"),
+        "label": first.get("label"),
+        "confidence": first.get("combined_score"),
+        "model_score": first.get("model_score"),
+        "style_score": first.get("style_score"),
+        "status": latest.get("status"),
+        "appealed": any(e.get("event") == "appeal" for e in entries),
+    })
 
 
 def main():
