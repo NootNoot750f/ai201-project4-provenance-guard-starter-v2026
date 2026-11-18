@@ -64,8 +64,17 @@ def sentence_length_spread(text: str) -> float:
     `stdev` raises on fewer than two values. Decide what that should return
     before the attack set decides for you.
     """
-    # TODO: replace this
-    return 0.0
+    # Scale: coefficient of variation (stdev / mean) of words per sentence.
+    # Higher = more varied = more human-looking. Fewer than two sentences has
+    # no spread to measure, so it returns 0.0 and style_signal handles it.
+    lengths = [len(words(s)) for s in sentences(text)]
+    lengths = [n for n in lengths if n > 0]
+    if len(lengths) < 2:
+        return 0.0
+    mean = statistics.mean(lengths)
+    if mean == 0:
+        return 0.0
+    return statistics.stdev(lengths) / mean
 
 
 def type_token_ratio(text: str) -> float:
@@ -80,8 +89,12 @@ def type_token_ratio(text: str) -> float:
     directly comparable on it, and if your test inputs vary a lot in length,
     that alone can look like a signal.
     """
-    # TODO: replace this
-    return 0.0
+    # Higher = more varied vocabulary = more human-looking.
+    # Known weakness: this falls as text gets longer, so long texts score lower.
+    tokens = words(text)
+    if not tokens:
+        return 0.0
+    return len(set(tokens)) / len(tokens)
 
 
 def punctuation_density(text: str) -> float:
@@ -94,8 +107,14 @@ def punctuation_density(text: str) -> float:
         more interesting than full stops, because they vary more between
         writers.
     """
-    # TODO: replace this
-    return 0.0
+    # Counts the "varied" marks only: commas, semicolons, colons, dashes.
+    # Full stops and question marks are left out on purpose — every sentence
+    # has one, so they say little about the writer. Result is marks per word.
+    tokens = words(text)
+    if not tokens:
+        return 0.0
+    marks = len(re.findall(r"[,;:—–]|\s-\s", text))
+    return marks / len(tokens)
 
 
 # ── Combining them ───────────────────────────────────────────────────────────
@@ -122,8 +141,27 @@ def style_signal(text: str) -> float:
     you trust it. Plain and ordinary, not formal: formal prose reads as *human*
     to signal one, and it is plain writing that gets accused.
     """
-    # TODO: replace this
-    return 0.5
+    # Each measure is turned into an AI-ish score in 0–1 (higher = more AI),
+    # then the three are averaged with equal weight.
+    #
+    # Scaling choices (written down because the combining rule depends on them):
+    #   spread:  CV of 1.0 or more -> 0 (very human). CV 0 -> 1 (machine-even).
+    #   ttr:     0.3 or less -> 1 (narrow vocab, AI-ish); 0.8 or more -> 0.
+    #   punct:   0 marks per word -> 1 (AI-ish); 0.15 or more per word -> 0.
+    #   Fewer than 2 sentences: spread is unmeasurable, so it counts as 0.5.
+    def clip(x: float) -> float:
+        return min(max(x, 0.0), 1.0)
+
+    if len(sentences(text)) < 2:
+        spread_ai = 0.5
+    else:
+        spread_ai = 1.0 - clip(sentence_length_spread(text) / 1.0)
+
+    ttr_ai = clip(1.0 - (type_token_ratio(text) - 0.3) / 0.5)
+    punct_ai = 1.0 - clip(punctuation_density(text) / 0.15)
+
+    score = (spread_ai + ttr_ai + punct_ai) / 3.0
+    return round(clip(score), 4)
 
 
 if __name__ == "__main__":
