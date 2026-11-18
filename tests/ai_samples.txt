@@ -1,0 +1,35 @@
+# AI-generated samples — written by Claude (claude-haiku-5-5), in this session, 2026-11-18
+# Prompt used for every sample: "Write a short paragraph of about 80 to 120 words on the topic below.
+# Use a plain, everyday tone. Do not mention that you are an AI."
+# Topics match the human samples so the two sets cover the same ground.
+# Each block is one piece. Don't edit after the first run.
+
+## A01 — Everyday observation (topic: a forgotten cup of coffee)
+Every morning begins with good intentions, and mine often includes a cup of coffee. This morning, I poured it, set it on the desk, and turned to check a message that seemed urgent. By the time I looked back, the coffee had cooled to a temperature that made it unappealing, though not quite cold enough to pour out. Reheating it felt like a small chore, but the microwave tends to change the taste in ways I dislike. It was a minor thing, yet it set a slightly irritating tone for the day ahead.
+
+## A02 — Technology (topic: a phone charging port that stopped working)
+When a phone starts charging poorly, the first instinct is often to blame the cable or the charger. In many cases, however, the real cause is lint or small debris packed inside the charging port. Carefully removing the buildup with a wooden tool, while the device is powered off, can restore a secure connection. It is worth checking the port before paying for a repair or a replacement. Often, that simple cleaning is all that is needed.
+
+## A03 — Opinion (topic: working alone versus in a team)
+Working alone has clear advantages for people who value focus and autonomy. It allows you to set your own pace, shape your environment, and move through complex problems without interruption. Collaboration, on the other hand, brings fresh perspectives and helps catch mistakes early. The best approach often depends on the task, and many people benefit from a balance of both. Choosing the right mix can make work both more productive and more satisfying.
+
+## A04 — Memory (topic: a school science fair that went wrong)
+Looking back on school science fairs, many people remember the moments when things went wrong. One student may recall a project that collapsed just before the judges arrived. Such experiences can be stressful at the time, but they often teach valuable lessons. Staying composed, explaining the work clearly, and adapting quickly are skills that extend far beyond the classroom. In hindsight, those unexpected moments can become some of the most memorable parts of the experience.
+
+## A05 — Casual explanation (topic: bouldering as a sport)
+Bouldering is a form of climbing that takes place on short walls without ropes. Climbers rely on strength, balance, and problem-solving to complete routes called problems. Each route requires planning the best sequence of moves to reach the top safely. Falls are usually cushioned by thick mats placed on the ground. Many people find bouldering both physically demanding and mentally engaging, which makes it a rewarding way to exercise.
+
+## A06 — Technical (topic: how a computer joins a Wi-Fi network)
+Connecting a computer to a Wi-Fi network involves several coordinated steps. The device first detects available networks by listening for signals broadcast by nearby access points. After a password is entered, the devices complete an authentication process that verifies the credentials and establishes encryption. Finally, the router assigns the computer an IP address, typically through DHCP, which allows it to communicate with other devices and the wider internet. Each stage supports secure and reliable access.
+
+## A07 — Reflection (topic: rethinking productivity)
+Productivity is often equated with being busy, but this view can be misleading. Filling every hour with tasks may create the appearance of progress while reducing the quality of the work. Rest and reflection are important for maintaining focus and creative thinking. Effective productivity often comes from identifying the most meaningful priorities and protecting time to recover. Working sustainably tends to produce better results over the long term.
+
+## A08 — Practical (topic: planning for a busy week)
+Preparing for a busy week can make the days ahead feel more manageable. Starting with a complete list of deadlines, meetings, and errands helps prevent important tasks from being overlooked. Setting a few clear priorities for each day gives structure to the schedule. Handling simple logistics in advance, such as planning meals or organizing essentials, reduces daily decision fatigue. A little preparation at the start of the week often leads to a calmer and more productive experience.
+
+## A09 — Short opinion (topic: reliability versus speed in computers)
+Reliability is generally more valuable than raw speed in a computer. A fast machine offers little benefit if it crashes unexpectedly, loses connections, or requires frequent troubleshooting. A system that performs consistently each time it is used saves time and reduces frustration. Over the long run, dependable performance tends to matter far more than marginal gains in processing power.
+
+## A10 — Longer reflection (topic: building a daily writing habit)
+Building a consistent writing habit can be harder than it first appears. A daily goal of several hundred words may seem modest, yet many writers struggle to maintain it. One common obstacle is perfectionism, where the urge to polish each sentence interrupts the flow of drafting. Separating the process into distinct stages, drafting first and editing later, can make the work more manageable. Over time, giving oneself permission to write imperfectly often leads to steadier progress and a more sustainable routine.
