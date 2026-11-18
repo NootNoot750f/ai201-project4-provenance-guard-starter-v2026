@@ -332,7 +332,7 @@ The service runs on `http://127.0.0.1:5000`. Set `PORT=5001` to run a second cop
 **Check it**
 
 ```bash
-curl.exe -X POST http://127.0.0.1:5000/ping -H "Content-Type: application/json" -d '{\"message\": \"hello\"}'
+curl -X POST http://127.0.0.1:5000/ping -H "Content-Type: application/json" -d '{"message": "hello"}'
 ```
 
 **New in the capstone**
