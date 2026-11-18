@@ -54,8 +54,8 @@ DETECTOR_MAX_TOKENS = 400
 # down BEFORE you code it, and to put the numbers in your README. Whatever you
 # decide, it goes here.
 
-WEIGHT_MODEL_SIGNAL = 0.5
-WEIGHT_STYLE_SIGNAL = 0.5
+WEIGHT_MODEL_SIGNAL = 0.3
+WEIGHT_STYLE_SIGNAL = 0.7
 
 # Disagreement rule: if the two signals are this far apart or further, the
 # combined score is pulled toward 0.5 by the damping factor (0.5 = halfway).
