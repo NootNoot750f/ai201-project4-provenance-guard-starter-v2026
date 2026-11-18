@@ -42,62 +42,60 @@ Two things worth knowing before you pick numbers:
   a **miss**.
 
 ---
-## 1.
+## 1. False Positives
 
-<!-- Your criterion. It must name a number. -->
+No more than 1 out of 10 pieces of human-written text that I personally wrote should be incorrectly labeled as AI.
 
+Why this target:
 
+I chose this target because falsely identifying human writing as AI can have serious consequences for the writer, including loss of credibility and potential academic penalties. For this reason, I believe it is more important to protect genuine writers from false accusations than to catch every instance of AI-generated writing.
+
+---
+
+## 2. Score Spread
+
+<!-- Your criterion. -->
+The average AI detection score across 10 AI-generated writing samples must be at least 0.20 higher than the average score across 10 human-written writing samples in each of the three trials.
 
 **Why this target:**
+I chose this target because the detector should be able to distinguish between human and AI-generated writing. A difference of at least 0.20 on a 0–1 scale provides a measurable separation between the two groups. If their scores are too similar, it could indicate that the detector struggles to identify the source of the writing.
 
 
 
 ---
 
-## 2.
+## 3. Label Coverage
 
 <!-- Your criterion. -->
-
+Each of the three available classifications (Human, AI, and Unsure) must be assigned to at least 2 of 10 predefined test samples across each of the three trials.
 
 
 **Why this target:**
-
+I chose this target because having three classifications is only useful if the system can actually utilize all three. Requiring each classification to appear at least twice makes it harder for the system to pass simply because one unusual piece of writing received an unexpected result.
 
 
 ---
 
-## 3.
+## 4. The appeal path
 
 <!-- Your criterion. -->
-
+All 5 predefined appeal submissions must successfully update their original classification status and create an entry in logs/audit.jsonl containing event: appeal during each of the three trials.
 
 
 **Why this target:**
-
+I chose this target because users should be able to challenge classifications they believe are incorrect. Every appeal should result in a status change and be recorded in the audit log. This provides accountability and allows appeals to be tracked rather than silently ignored.
 
 
 ---
 
-## 4.
+## 5. Bad Input
 
 <!-- Your criterion. -->
-
+The system must handle missing text, empty text, and text exceeding the 10,000-character limit by returning an appropriate HTTP 400 response with an error message, without crashing, in all three trials.
 
 
 **Why this target:**
-
-
-
----
-
-## 5.
-
-<!-- Your criterion. -->
-
-
-
-**Why this target:**
-
+I chose this target because users may accidentally submit incomplete or excessively large pieces of text. The system should recognize invalid input and explain the problem instead of crashing or attempting to process invalid data. This makes the service more reliable and user-friendly.
 
 
 ---
