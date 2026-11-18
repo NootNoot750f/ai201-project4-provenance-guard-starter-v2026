@@ -57,6 +57,15 @@ DETECTOR_MAX_TOKENS = 400
 WEIGHT_MODEL_SIGNAL = 0.5
 WEIGHT_STYLE_SIGNAL = 0.5
 
+# Disagreement rule: if the two signals are this far apart or further, the
+# combined score is pulled toward 0.5 by the damping factor (0.5 = halfway).
+DISAGREE_GAP = 0.4
+DISAGREE_DAMP = 0.5
+
+# Input limits. Text outside these is refused with a 400, not scored.
+MIN_TEXT_CHARS = 20
+MAX_TEXT_CHARS = 10000
+
 
 # ─── Thresholds (Milestone 5) ────────────────────────────────────────────────
 # Where one label becomes another. Scores run 0.0 (confidently human) to 1.0
