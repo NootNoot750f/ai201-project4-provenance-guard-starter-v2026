@@ -499,10 +499,70 @@ Results: mean **134.2 ms**, median 128.5 ms, min 107.0 ms, max 183.2 ms.
 
 Hundred a day: 100 submissions × 0.134 s ≈ **13.4 seconds of compute per day**. This doesn't include the electricity or the machine, which I did not measure.
 
-**Run Log and Verdicts.** *(filled in during Milestone 5)*
+**Run Log and Verdicts.** Five criteria, three trials each. Command: `python run_capstone.py --label before`. Full output: `results/capstone_run_2026-11-17_2117_before.md`. Verdicts are written by hand below.
 
-**The Improvement.** *(filled in during Milestone 6)*
+| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
+|---|---|---|---|---|---|
+| 1. Retrieve existing content | 5/5 retrievals | 5/5 | 5/5 | 5/5 | MET: All five saved content IDs returned the correct stored classification results in every trial. |
+| 2. Unknown IDs return 404 | 5/5 | 5/5 | 5/5 | 5/5 | MET: All five nonexistent IDs returned HTTP 404 with an error field in every trial. |
+| 3. Duration recorded | 10/10 | 10/10 | 10/10 | 10/10 | MET: Every tested decision entry contained a numeric, nonnegative duration_ms value. |
+| 4. Text length after stripping | 10/10 | 10/10 | 10/10 | 10/10 | MET: All ten decision entries recorded text lengths matching the submitted text after leading and trailing whitespace was stripped. |
+| 5. Bad input rejected and logged | 3/3 | 3/3 | 3/3 | 3/3 | MET: All three invalid submissions returned HTTP 400 and were logged with their expected rejection reasons. |
 
-**What's Still Broken.** *(filled in during Milestone 7)*
+Overall verdict: 5/5 criteria MET across all three trials.
+
+Excerpt from trial 1 (criterion 4 for the first two submissions, and criterion 5's first case). The `sub-01` row is the one with leading and trailing spaces:
+
+```json
+[
+  {
+    "creator": "capstone-sub-01",
+    "text_length": 406,
+    "expected": 406,
+    "passed": true
+  },
+  {
+    "creator": "capstone-sub-02",
+    "text_length": 430,
+    "expected": 430,
+    "passed": true
+  },
+  {
+    "id": "bad-input-01",
+    "http": 400,
+    "logged_reason": "text_too_short",
+    "expected_reason": "text_too_short",
+    "passed": true
+  }
+]
+```
+
+
+**The Improvement.** DRAFT — rewrite in your own words.
+
+**What I changed:** no code changed. I tightened criterion 4 by adding a whitespace-only submission (`capstone-whitespace-01`) that must be rejected with HTTP 400 and logged with `text_length` 0. The original criterion 4 line is still in `criteria.md`, with the revision underneath it and the reason.
+
+**Which diagnosis pointed at it:** none. Every criterion passed in the first run, so there was no miss to diagnose. The tightening was for criterion 4 because its original test could only check the stripping on the ten submissions, and every one of them passed. That's a weak check, not a failure.
+
+**Run Log, tightened criterion 4 (`python run_capstone.py --label tightened`):**
+
+| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
+|---|---|---|---|---|---|
+| 4. Text length after stripping (original) | 10/10 | 10/10 | 10/10 | 10/10 | MET |
+| 4. Whitespace-only submission (added) | 1/1 | 1/1 | 1/1 | 1/1 | *(your verdict)* |
+
+Full output: `results/capstone_run_2026-11-17_2138_tightened.md`.
+
+**Did it help:** the tightened check passed in every trial. It didn't reveal a problem, which is the honest result of a check that the service already handled correctly.
+
+
+**What's Still Broken.** DRAFT — rewrite in your own words.
+
+**Still missed:** nothing in the five capstone criteria. All five passed in all three trials.
+
+**What I'd do next, and why I stopped:** the checks I wrote mostly confirm what the code always writes. Criteria 3 and 4 can't fail unless the logging breaks, and criterion 1 compares the endpoint to the same log it reads from. I stopped at the tightened criterion 4 because the brief asked for one change, and I didn't find a real miss to fix. The next step I'd take is a criterion that tests something the service could get wrong, such as a `GET /content/<id>` for an item whose appeal was logged after its decision, checked against the status the log shows.
+
+**The one thing I'd do first:** write a criterion that tests the endpoint against a fresh submission made while the service is under the rate limit, so it checks more than the log's own consistency.
+
 
 **How I Used AI.** *(filled in during Milestone 7)*

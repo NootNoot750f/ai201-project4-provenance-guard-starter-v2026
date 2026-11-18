@@ -169,6 +169,12 @@ Written before any capstone results existed. Committed in: capstone criteria
 
 **Why this target:** Text length provides useful information about submission sizes without requiring someone to inspect the full content. Since the service strips leading and trailing whitespace, the logged length should reflect the text after that operation.
 
+**Additional criterion (revised after the first run):** A whitespace-only submission using the creator_id capstone-whitespace-01 must be rejected with HTTP 400 and logged with text_length equal to 0 after leading and trailing whitespace is stripped.
+
+**Target:** 10/10 accurate text-length entries for the original submissions, plus 1/1 whitespace-only submission handled correctly in each trial.
+
+**Why this target:** A whitespace-only submission may contain characters before stripping, but it has no actual text content afterward. Testing this case verifies that the service measures the text consistently after trimming whitespace and does not treat whitespace as meaningful content.
+
 ## 5. Handle rejected submissions
 
 **Criterion:** The following three predefined submissions must each return HTTP 400 and create a rejection entry in the audit log with the specified reason:
