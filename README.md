@@ -227,6 +227,14 @@ AI identified several problems, including an overly high false-positive threshol
 - *What I changed:*
 I revised my criteria based on the feedback. I changed the false-positive threshold from 1 in 5 to 1 in 10, changed the score difference from 20 percentage points to 0.20, and changed the maximum input length in my criterion from 100,000 to 10,000 characters to match the existing config.py setting. I also strengthened the label coverage requirement.
 
+**Moment 3: the attack set and the criteria trials**
+
+- *What I asked for:* I asked for help reading the attack-set results and checking whether my diagnoses matched them. For the criteria, I asked for help understanding the score-spread numbers.
+- *What came back:* Explanations of the score spread and the damping rule, and draft diagnoses.
+- *What I changed:* I accepted reweighting as the approach, and I reviewed the 0.3/0.7 numbers before keeping them. I corrected the false-positive wording in the diagnoses and in the still-broken list. I wrote the MET and MISSED verdicts myself.
+- *Caveat:* I chose the weights after seeing the before results on the same samples, so the after run is not a clean test.
+
+
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
 ---
@@ -251,12 +259,13 @@ There are some trade-offs with this approach. Someone could potentially bypass t
 
 **The run of status codes when I pushed past it:**
 
-I tested the rate limiter by sending eight POST /submit requests using the same creator_id, rl-demo.
-200 200 200 200 200 429 429 429
+Ran `python run_attacks.py --flood 15` against the running service. It sent 15 submissions from one `creator_id` (`flood_tester`) and printed:
 
+```
+200 200 200 200 200 429 429 429 429 429 429 429 429 429 429
+```
 
-The first five requests were accepted, while the remaining three received HTTP 429 (Too Many Requests). These rejected requests were also recorded in the audit log with event: rejected, reason: rate_limited, and limit: 5 per 1 minute.
-
+Ten of 15 were rate-limited. The output is saved in `results/flood_2026-11-17_2016.md`. The 429 rejections were logged as `event: rejected`, `reason: rate_limited`, `limit: 5 per 1 minute`.
 ---
 
 ## Attack Run — Before
