@@ -212,14 +212,20 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 **Moment 1**
 
 - *What I asked for:*
+I asked AI to help finish the project by implementing the missing functionality in the code, including the writing-style signal, combining rule, three classification labels, and the /submit and /appeal routes.
 - *What came back:*
+AI implemented those components and ran the detection model against four test paragraphs, recording the results.
 - *What I changed:*
+I reviewed the generated implementation and examined the output from the four test paragraphs. I also looked at how the different signals were combined and how the classifications were assigned.
 
-**Moment 2**
+**Moment 2** The criteria
 
 - *What I asked for:*
+I asked AI to review my evaluation criteria and identify weaknesses, vague measurements, and unrealistic targets.
 - *What came back:*
+AI identified several problems, including an overly high false-positive threshold, inconsistent score units, an input limit that didn't match the existing configuration, and label coverage that was too easy to pass.
 - *What I changed:*
+I revised my criteria based on the feedback. I changed the false-positive threshold from 1 in 5 to 1 in 10, changed the score difference from 20 percentage points to 0.20, and changed the maximum input length in my criterion from 100,000 to 10,000 characters to match the existing config.py setting. I also strengthened the label coverage requirement.
 
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
