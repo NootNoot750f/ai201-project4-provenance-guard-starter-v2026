@@ -130,3 +130,52 @@ I chose this target because users may accidentally submit incomplete or excessiv
      A number you missed stays where it is, gets diagnosed, and gets a fix
      attempted. That's where the points are.
      ───────────────────────────────────────────────────────────────────────── -->
+
+---
+
+## Capstone criteria
+
+Written before any capstone results existed. Committed in: 
+
+## 1. Retrieve existing content
+
+**Criterion:** Before each trial, submit five valid capstone submissions and save the content_id returned by the server for each one in a list, named capstone-content-01 through capstone-content-05. For each of these five IDs, GET /content/<id> must return HTTP 200 and the correct guess, label, scores, status, and appeal flag for that submission.
+
+**Target:** 5/5 successful retrievals in each trial.
+
+**Why this target:** The new endpoint is intended to retrieve the stored classification results for previously submitted content. Returning incorrect scores, labels, or appeal status could make the endpoint unreliable when users review earlier submissions.
+
+## 2. Handle unknown content IDs
+
+**Criterion:** Requests to GET /content/<id> using the five nonexistent IDs missing-content-01, missing-content-02, missing-content-03, missing-content-04, and missing-content-05 must return HTTP 404 with an error field in the response body.
+
+**Target:** 5/5 requests return HTTP 404 with an error field in each trial.
+
+**Why this target:** Users may request IDs that do not exist. Returning a consistent 404 response makes it clear that the requested content could not be found.
+
+## 3. Record request duration
+
+**Criterion:** The audit log entries of type decision for submissions using the creator_id values capstone-sub-01 through capstone-sub-10 must each contain a duration_ms field that exists, is numeric, and is greater than or equal to zero. For each trial, evaluate the ten most recent matching decision entries, so earlier trial entries are not counted again.
+
+**Target:** 10/10 entries contain valid duration_ms values in each trial.
+
+**Why this target:** Request duration helps identify performance problems and investigate how long the service takes to process submissions. Every tested decision entry should contain a usable duration value.
+
+## 4. Record text length accurately
+
+**Criterion:** Every decision entry for submissions using the creator_id values capstone-sub-01 through capstone-sub-10 must contain a text_length field that matches the character count of the submitted text after leading and trailing whitespace is stripped. For each trial, evaluate the ten most recent matching decision entries.
+
+**Target:** 10/10 entries have an accurate text_length value in each trial.
+
+**Why this target:** Text length provides useful information about submission sizes without requiring someone to inspect the full content. Since the service strips leading and trailing whitespace, the logged length should reflect the text after that operation.
+
+## 5. Handle rejected submissions
+
+**Criterion:** The following three predefined submissions must each return HTTP 400 and create a rejection entry in the audit log with the specified reason:
+- bad-input-01: Empty text, expected reason text_too_short.
+- bad-input-02: Missing text field, expected reason text_not_string.
+- bad-input-03: Text containing 10,001 non-whitespace characters, expected reason text_too_long.
+
+**Target:** 3/3 submissions return HTTP 400 and are logged with the correct rejection reason in each trial.
+
+**Why this target:** Invalid submissions should be rejected consistently, and the audit log should explain why each request failed. These three cases cover missing, empty, and oversized text.
